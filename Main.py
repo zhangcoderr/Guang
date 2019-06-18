@@ -13,7 +13,6 @@ def copy():
     k.press_key(k.control_l_key)
     k.tap_key("C")
     k.release_key(k.control_l_key)
-    print(pyperclip.paste())
 
 
 # def onMouseEvent(event):
@@ -29,15 +28,36 @@ def copy():
 # pythoncom.PumpMessages()
 
 
-def on_click(x,y,button,pressed):
-    if(button==mouse.Button.left and pressed==False):
-        copy()
+def onpressed(key):
+    if(key==keyboard.Key.caps_lock):
+        last=pyperclip.paste()
+        maxTime=5
+        while(pyperclip.paste()==last and maxTime>0):
+            maxTime=maxTime-1
+            time.sleep(0.5)
+            print('doing')
+            copy()
+        if(maxTime<=0):
+            return
+        print(pyperclip.paste())
+
 k=PyKeyboard()
 m=PyMouse()
-
-
-
-with mouse.Listener(on_click=on_click) as listener:
+with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 
+
+# def on_click(x,y,button,pressed):
+#     if(button==mouse.Button.left or button==mouse.Button.right):
+#         last = pyperclip.paste()
+#         maxTime = 5
+#         while (pyperclip.paste() == last and maxTime > 0):
+#             maxTime = maxTime - 1
+#             time.sleep(0.5)
+#             print('doing')
+#             copy()
+#         print(pyperclip.paste())
+#
+# with mouse.Listener(on_click=on_click) as listener:
+#     listener.join()
 

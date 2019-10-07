@@ -27,14 +27,15 @@ def copy():
 #     # 循环监听
 # pythoncom.PumpMessages()
 class ExcelData:
-    def __init__(self,keyArray,result,type):
+    def __init__(self,keyArray,results,args,type):
         self.keyArray=keyArray
-        self.result=result
+        self.results=results
+        self.args=args
         self.type=type
 
 def getExcelData():
     datas=[]
-    excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang.xlsx")
+    excel = xlrd.open_workbook(r"C:\Users\123\Desktop\广联达\安装\guang.xlsx")
     table = excel.sheets()[0]
     rowCount = table.nrows
     colCount = table.ncols
@@ -42,9 +43,11 @@ def getExcelData():
     for i in range(rowCount):
         if(i==0): continue
         keyArray=str(table.cell_value(i,0)).split('$')
-        result=str(table.cell_value(i,1))
-        type=str(table.cell_value(i,4))
-        data=ExcelData(keyArray,result,type)
+        #result=str(table.cell_value(i,1))
+        results=str(table.cell_value(i,1)).split('$')
+        args=str(table.cell_value(i,2)).split('$')
+        type=str(table.cell_value(i,5))
+        data=ExcelData(keyArray,results,args,type)
         datas.append(data)
 
     return datas
@@ -53,7 +56,7 @@ def getresult(str):
     print(str)
     datas= getExcelData()
 
-    result=''
+    result=ExcelData('','','','')
     contains_key=False
     for data in datas:
 
@@ -65,7 +68,7 @@ def getresult(str):
                 contains_key=False
                 break
         if(contains_key):
-            result=data.result
+            result=data
 
     return result
 
@@ -79,16 +82,36 @@ def onpressed(key):
             print('doing')
             copy()
         if(maxTime>0):
-            r= getresult(pyperclip.paste())
-            if(r==''):
+            result_data= getresult(pyperclip.paste())
+            if(result_data.results==''):
                 print('没有这个:'+pyperclip.paste()+' ，需更新表格')
                 return
             k.tap_key(k.escape_key)
             k.tap_key(k.left_key)
             k.tap_key(k.left_key)
             k.tap_key(k.down_key)
-            k.type_string(r)
-            k.tap_key(k.enter_key)
+            for i in range(len(result_data.results)):
+
+                k.type_string(result_data.results[i])
+                k.tap_key(k.enter_key)
+                k.tap_key(k.enter_key)
+
+                if(len(result_data.args)>0):
+                    for j in range(int(result_data.args[i])):
+                        print(1111)
+                        k.tap_key(k.enter_key)
+                        #time.sleep(1)
+
+
+                    k.tap_key(k.escape_key)
+                    k.tap_key(k.left_key)
+                    k.tap_key(k.left_key)
+                    k.tap_key(k.left_key)
+                    k.tap_key(k.left_key)
+
+
+
+
 k=PyKeyboard()
 m=PyMouse()
 print('start')

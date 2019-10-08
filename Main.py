@@ -35,7 +35,7 @@ class ExcelData:
 
 def getExcelData():
     datas=[]
-    excel = xlrd.open_workbook(r"C:\Users\123\Desktop\广联达\安装\guang.xlsx")
+    excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang.xlsx")#----------------------------
     table = excel.sheets()[0]
     rowCount = table.nrows
     colCount = table.ncols
@@ -69,7 +69,7 @@ def getresult(str):
                 break
         if(contains_key):
             result=data
-
+    print(result.keyArray)
     return result
 
 def onpressed(key):
@@ -83,7 +83,7 @@ def onpressed(key):
             copy()
         if(maxTime>0):
             result_data= getresult(pyperclip.paste())
-            if(result_data.results==''):
+            if(result_data.results=='' or result_data.results==['']):
                 print('没有这个:'+pyperclip.paste()+' ，需更新表格')
                 return
             k.tap_key(k.escape_key)
@@ -96,7 +96,7 @@ def onpressed(key):
                 k.tap_key(k.enter_key)
                 k.tap_key(k.enter_key)
 
-                if(len(result_data.args)>0):
+                if(len(result_data.args)>0 and result_data.args!=['']):
                     for j in range(int(result_data.args[i])):
                         print(1111)
                         k.tap_key(k.enter_key)
@@ -114,7 +114,10 @@ def onpressed(key):
 
 k=PyKeyboard()
 m=PyMouse()
+datas = getExcelData()
+
 print('start')
+
 with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 

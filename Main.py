@@ -7,7 +7,7 @@ import pythoncom
 import xlrd
 import  pyperclip
 from pynput import mouse,keyboard
-
+import re
 def copy():
 
     k.press_key(k.control_l_key)
@@ -27,15 +27,16 @@ def copy():
 #     # 循环监听
 # pythoncom.PumpMessages()
 class ExcelData:
-    def __init__(self,keyArray,results,args,type):
+    def __init__(self,keyArray,results,args,max_args):
         self.keyArray=keyArray
         self.results=results
         self.args=args
-        self.type=type
+        self.max_args=max_args
 
 def getExcelData():
     datas=[]
-    excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang.xlsx")#----------------------------
+    excel = xlrd.open_workbook(r"C:\Users\123\Desktop\广联达\安装\guang.xlsx")
+    #excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang.xlsx")  # ----------------------------
     table = excel.sheets()[0]
     rowCount = table.nrows
     colCount = table.ncols
@@ -46,14 +47,14 @@ def getExcelData():
         #result=str(table.cell_value(i,1))
         results=str(table.cell_value(i,1)).split('$')
         args=str(table.cell_value(i,2)).split('$')
-        type=str(table.cell_value(i,5))
-        data=ExcelData(keyArray,results,args,type)
+        max_args=str(table.cell_value(i,5)).split('$')
+        data=ExcelData(keyArray,results,args,max_args)
         datas.append(data)
 
     return datas
 
-def getresult(str):
-    print(str)
+def getresult(string):
+    print(string)
     datas= getExcelData()
 
     result=ExcelData('','','','')
@@ -61,15 +62,31 @@ def getresult(str):
     for data in datas:
 
         for key in data.keyArray:
-            if(key in str):
+            if(key in string):
                 contains_key=True
                 continue
             else:
                 contains_key=False
                 break
+        if(data.max_args!=[''] or data.max_args!=[]):
+            #str = '1、名称：止回阀 2、型号：400*250 3、设单独支吊架'
+            regex_compile=data.max_args[0]
+            compile='\d+\\'+regex_compile+'\d+'
+            regex = re.compile(compile)
+            if(regex.search(string)!=None):
+                value_re = str(regex.search(string).group())
+                left=int(value_re.split(regex_compile)[0])
+                right = int(value_re.split(regex_compile)[1])
+                max=int(data.max_args[1])
+                if((left+right)*2<=max):
+                    contains_key=True
+                    print(data)
+                else:
+                    contains_key=False
+
         if(contains_key):
             result=data
-    print(result.keyArray)
+
     return result
 
 def onpressed(key):
@@ -83,7 +100,7 @@ def onpressed(key):
             copy()
         if(maxTime>0):
             result_data= getresult(pyperclip.paste())
-            if(result_data.results=='' or result_data.results==['']):
+            if(result_data.results==''or result_data.results==['']):
                 print('没有这个:'+pyperclip.paste()+' ，需更新表格')
                 return
             k.tap_key(k.escape_key)
@@ -115,9 +132,7 @@ def onpressed(key):
 k=PyKeyboard()
 m=PyMouse()
 datas = getExcelData()
-
 print('start')
-
 with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 

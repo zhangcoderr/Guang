@@ -21,12 +21,14 @@ def tapkey(key,count=1):
         time.sleep(0.05)
 
 class ExcelData:
-    def __init__(self,keyArray,results,args,max_args,max_number):
+
+    def __init__(self,keyArray,results,args,max_args,max_number,excelIndex):
         self.keyArray=keyArray
         self.results=results
         self.args=args
         self.max_args=max_args
         self.max_number=max_number
+        self.excelIndex=excelIndex
 
 def getExcelData():
     datas=[]
@@ -44,7 +46,7 @@ def getExcelData():
         args=str(table.cell_value(i,2)).split('$')
         max_args=str(table.cell_value(i,5)).split('$')
         max_number=str(table.cell_value(i,6))
-        data=ExcelData(keyArray,results,args,max_args,max_number)
+        data=ExcelData(keyArray,results,args,max_args,max_number,i+1)
         datas.append(data)
 
     return datas
@@ -53,7 +55,7 @@ def getresult(string):
     print(string)
     datas= getExcelData()
 
-    result=ExcelData('','','','','')
+    result=ExcelData('','','','','',0)
     contains_key=False
     last_result=''
     for data in datas:
@@ -86,6 +88,8 @@ def getresult(string):
                         result = data
 
             if(data.max_number!=''):
+                if(data.excelIndex==839):
+                    print(1)
                 result=last_result
                 re_compile_list=re.findall(re.compile('\d+'),string)
                 max=0
@@ -101,7 +105,7 @@ def getresult(string):
     return result
 
 def Huan(data):
-
+    #print(data.keyArray)
     if(data.keyArray==['矿物','电缆','-']):
         tapkey(k.function_keys[2])
 
@@ -113,22 +117,38 @@ def Huan(data):
         m.press(505, 393)
         time.sleep(0.5)
         tapkey(k.enter_key)
-    if(data.keyArray[0]=='电力电缆' or data.keyArray==['电缆', '头', '户内干包', '10'] or data.keyArray==['电缆', '头', '户内干包', '25']):
+        print('矿物')
+    if(data.keyArray[0]=='电力电缆'):
         if(data.max_number=='10.0' or data.max_number == '10'):
             #k.tap_key(k.function_keys[5])  # Tap F5
             k.tap_key(k.function_keys[2])
             time.sleep(1)
-            m.press(505, 471)
+            m.press(503, 443)
             time.sleep(0.5)
             k.tap_key(k.enter_key)
-            print('huan 10')
+            print('换 10')
         if (data.max_number == '25.0'or data.max_number == '25'):
             k.tap_key(k.function_keys[2])
             time.sleep(1)
-            m.press(507, 442)
+            m.press(503, 414)
             time.sleep(0.5)
             k.tap_key(k.enter_key)
-            print('huan 20')
+            print('换 25')
+    if(data.keyArray==['电缆', '头', '户内干包', '10']):
+        k.tap_key(k.function_keys[2])
+        time.sleep(1)
+        m.press(501, 393)
+        time.sleep(0.5)
+        k.tap_key(k.enter_key)
+        print('huan 10')
+    if (data.keyArray == ['电缆', '头', '户内干包', '25']):
+        k.tap_key(k.function_keys[2])
+        time.sleep(1)
+        m.press(505, 336)
+        time.sleep(0.5)
+        k.tap_key(k.enter_key)
+        print('huan 25')
+
 
 def onpressed(key):
     if(key==keyboard.Key.caps_lock):
@@ -145,6 +165,10 @@ def onpressed(key):
             if(result_data==''or result_data.results==''or result_data.results==['']):
                 print('没有这个:\n'+pyperclip.paste()+' \n，需更新表格')
                 return
+            print('表格：')
+            print(result_data.keyArray)
+            print('Index:'+str(result_data.excelIndex))
+            print('表格end')
             k.tap_key(k.escape_key)
             tapkey(k.left_key,6)
             tapkey(k.right_key,3)
@@ -162,15 +186,20 @@ def onpressed(key):
                         #time.sleep(1)
 
 
-                    k.tap_key(k.escape_key)
+                    k.tap_key(k.escape_key)#！！！！/有的文件回车后在工程量计算式这列所以需要把注释去掉！！
+                    k.tap_key(k.left_key)  #自己创的文件需要去注释  别人的文件要测试下回车后在哪
                     k.tap_key(k.left_key)
                     k.tap_key(k.left_key)
                     k.tap_key(k.left_key)
-                    k.tap_key(k.left_key)
-        m.move(mouse_position[0],mouse_position[1])
+        #m.move(mouse_position[0],mouse_position[1])
 
 k=PyKeyboard()
 m=PyMouse()
+
+# time.sleep(4)
+# print(m.position())
+# time.sleep(10)
+
 datas = getExcelData()
 print('start')
 with keyboard.Listener(on_press=onpressed) as listener:

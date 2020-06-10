@@ -20,15 +20,30 @@ def tapkey(key,count=1):
         k.tap_key(key)
         time.sleep(0.05)
 
-class ExcelData:
+        
+def getCopy(maxTime=2):
+    #maxTime = 3  # 3秒复制 调用copy() 不管结果对错
+    while (maxTime > 0):
+        maxTime = maxTime - 0.5
+        time.sleep(0.5)
+        # print('doing')
+        copy()
 
-    def __init__(self,keyArray,results,args,max_args,max_number,excelIndex):
+    result = pyperclip.paste()
+    return result
+
+class ExcelData:
+    
+    def __init__(self,keyArray,results,args,max_args,max_number,excelIndex,argType,argValues):
         self.keyArray=keyArray
         self.results=results
         self.args=args
         self.max_args=max_args
         self.max_number=max_number
         self.excelIndex=excelIndex
+        self.argType=argType
+        self.argValues=argValues
+        self.firstArgValue=argValues[0]
 
 def getExcelData():
     datas=[]
@@ -39,6 +54,7 @@ def getExcelData():
     colCount = table.ncols
 
     for i in range(rowCount):
+        #old
         if(i==0): continue
         keyArray=str(table.cell_value(i,0)).split('$')
         #result=str(table.cell_value(i,1))
@@ -46,8 +62,29 @@ def getExcelData():
         args=str(table.cell_value(i,2)).split('$')
         max_args=str(table.cell_value(i,5)).split('$')
         max_number=str(table.cell_value(i,6))
+        
         data=ExcelData(keyArray,results,args,max_args,max_number,i+1)
         datas.append(data)
+        
+        
+        #6.10
+        if(i==0): continue
+        keyArray=str(table.cell_value(i,0)).split('$')
+        #result=str(table.cell_value(i,1))
+        results=str(table.cell_value(i,1)).split('$')
+        args=str(table.cell_value(i,2)).split('$')
+        max_args=str(table.cell_value(i,5+1)).split('$')
+        max_number=str(table.cell_value(i,6+1))
+        
+        argArray=str(table.cell_value(i,3)).split('$')
+        argType=argArray[0]
+        argValues=argArray[1].split('/')
+        
+        
+        
+        data=ExcelData(keyArray,results,args,max_args,max_number,i+1,argType,argValues)
+        datas.append(data)
+        
 
     return datas
 
@@ -55,7 +92,7 @@ def getresult(string):
     print(string)
     datas= getExcelData()
 
-    result=ExcelData('','','','','',0)
+    result=ExcelData('','','','','',0,'','')
     contains_key=False
     last_result=''
     for data in datas:
@@ -105,6 +142,7 @@ def getresult(string):
     return result
 
 def Huan(data):
+    #old
     mouse_position = m.position()
 
     #print(data.keyArray)
@@ -159,8 +197,21 @@ def Huan(data):
         k.tap_key(k.enter_key)
         print('huan 25')
     #m.move(mouse_position[0],mouse_position[1])
+    
+    #6.10
+    
+    x=data.firstArgValue.split(',')[0]
+    y=data.firstArgValue.split(',')[1]
+    k.tap_key(k.function_keys[2])
+    time.sleep(1)
+    #m.press(505, 336)
+    m.press(x, y)
+    time.sleep(0.5)
+    k.tap_key(k.enter_key)
+    
 
 
+    
 def onpressed(key):
     if(key==keyboard.Key.caps_lock):
         last=pyperclip.paste()
@@ -181,6 +232,10 @@ def onpressed(key):
             # print('Index:'+str(result_data.excelIndex))
             # print('表格end')
             k.tap_key(k.escape_key)
+            
+       
+                                     
+            
             tapkey(k.left_key,6)
             tapkey(k.right_key,3)
             k.tap_key(k.down_key)
@@ -188,7 +243,8 @@ def onpressed(key):
 
                 k.type_string(result_data.results[i])
                 k.tap_key(k.enter_key)
-                Huan(result_data)#----------------------------------------------------------------------------
+                if(resultdata.argType=='1' or resultdata.argType=='1.0')
+                    Huan(result_data)#----------------------------------------------------------------------------
                 k.tap_key(k.enter_key)
 
                 if(len(result_data.args)>0 and result_data.args!=['']):

@@ -34,7 +34,7 @@ def getCopy(maxTime=2):
 
 class ExcelData:
     
-    def __init__(self,keyArray,results,args,max_args,max_number,excelIndex,argType,argValues):
+    def __init__(self,keyArray,results,args,max_args,max_number,excelIndex,argType,argValues,argNames):
         self.keyArray=keyArray
         self.results=results
         self.args=args
@@ -43,68 +43,78 @@ class ExcelData:
         self.excelIndex=excelIndex
         self.argType=argType
         self.argValues=argValues
-        self.firstArgValue=argValues[0]
+        if(argValues!=[]):
+            try:
+                self.firstArgValue=argValues[0]
+            except:
+                print(self.argValues)
+
+        self.argNames=argNames
+        if (argValues != []):
+            try:
+                self.firstArgName = argValues[0]
+            except:
+                print(self.argNames)
+
 
 def getExcelData():
     datas=[]
     #excel = xlrd.open_workbook(r"C:\Users\123\Desktop\广联达\安装\guang.xlsx")
-    excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang.xlsx")  # ----------------------------
+    excel = xlrd.open_workbook(r"C:\Users\Administrator\Desktop\guang - New.xlsx")  # ----------------------------
     table = excel.sheets()[0]
     rowCount = table.nrows
     colCount = table.ncols
 
     for i in range(rowCount):
-        #old
-        if(i==0): continue
-        keyArray=str(table.cell_value(i,0)).split('$')
-        #result=str(table.cell_value(i,1))
-        results=str(table.cell_value(i,1)).split('$')
-        args=str(table.cell_value(i,2)).split('$')
-        max_args=str(table.cell_value(i,5)).split('$')
-        max_number=str(table.cell_value(i,6))
-        
-        data=ExcelData(keyArray,results,args,max_args,max_number,i+1)
-        datas.append(data)
-        
-        
+       
         #6.10
         if(i==0): continue
         keyArray=str(table.cell_value(i,0)).split('$')
         #result=str(table.cell_value(i,1))
         results=str(table.cell_value(i,1)).split('$')
         args=str(table.cell_value(i,2)).split('$')
-        max_args=str(table.cell_value(i,5+1)).split('$')
-        max_number=str(table.cell_value(i,6+1))
+        max_args=str(table.cell_value(i,5+2)).split('$')
+        max_number=str(table.cell_value(i,6+2))
         
         argArray=str(table.cell_value(i,3)).split('$')
         argType=argArray[0]
-        argValues=argArray[1].split('/')
-        
-        
-        
-        data=ExcelData(keyArray,results,args,max_args,max_number,i+1,argType,argValues)
+        argValues=[]
+        if(argArray!=['']):
+            argValues=argArray[1].split('/')
+
+
+        argNames=str(table.cell_value(i,4)).split('$')
+
+
+        data=ExcelData(keyArray,results,args,max_args,max_number,i+1,argType,argValues,argNames)
         datas.append(data)
         
 
     return datas
 
-def getresult(string):
-    print(string)
+def getresult(targetFeature,targetName):
+    print(targetFeature)
     datas= getExcelData()
 
-    result=ExcelData('','','','','',0,'','')
+    result=ExcelData('','','','','',0,'','','')
     contains_key=False
     last_result=''
     for data in datas:
         if data.keyArray==['']:
             continue
         for key in data.keyArray:
-            if(key in string):
+            if(key in targetFeature):
                 contains_key=True
                 continue
             else:
                 contains_key=False
                 break
+        
+        if(contains_key):
+            if(data.argNames!=['']):
+                contains_key=targetName in data.argNames
+
+
         if (contains_key):
             if(data.max_args==[''] or data.max_args==[]):
                 result = data
@@ -116,8 +126,8 @@ def getresult(string):
                 else:
                     compile='\d+'+regex_compile+'\d+'
                 regex = re.compile(compile)
-                if(regex.search(string)!=None):
-                    value_re = str(regex.search(string).group())
+                if(regex.search(targetFeature)!=None):
+                    value_re = str(regex.search(targetFeature).group())
                     left=int(value_re.split(regex_compile)[0])
                     right = int(value_re.split(regex_compile)[1])
                     max=int(data.max_args[1])
@@ -125,10 +135,8 @@ def getresult(string):
                         result = data
 
             if(data.max_number!=''):
-                if(data.excelIndex==839):
-                    print(1)
                 result=last_result
-                re_compile_list=re.findall(re.compile('\d+'),string)
+                re_compile_list=re.findall(re.compile('\d+'),targetFeature)
                 max=0
                 for number in re_compile_list:
                     if(int(number)>max):
@@ -144,60 +152,6 @@ def getresult(string):
 def Huan(data):
     #old
     mouse_position = m.position()
-
-    #print(data.keyArray)
-    if(data.keyArray==['矿物','电缆','-']):
-
-        tapkey(k.function_keys[2])
-
-        # time.sleep(2)
-        # print(m.position())
-        # time.sleep(10)
-
-        time.sleep(1)
-        #m.press(505, 393)
-        m.press(290, 251)
-        time.sleep(0.5)
-        tapkey(k.enter_key)
-        print('矿物')
-    if(data.keyArray[0]=='电力电缆'):
-        if(data.max_number=='10.0' or data.max_number == '10'):
-            #k.tap_key(k.function_keys[5])  # Tap F5
-            k.tap_key(k.function_keys[2])
-            time.sleep(1)
-            m.press(291, 287)
-            #m.press(503, 443)
-            time.sleep(0.5)
-            k.tap_key(k.enter_key)
-            print('换 10')
-        if (data.max_number == '25.0'or data.max_number == '25'):
-            k.tap_key(k.function_keys[2])
-            time.sleep(1)
-            m.press(293, 263)
-            #m.press(503, 414)
-            time.sleep(0.5)
-            k.tap_key(k.enter_key)
-            print('换 25')
-    #if(data.keyArray==['电缆', '头', '户内干包', '10']):
-    if ('户内干包' in data.keyArray and '10' in data.keyArray):
-        k.tap_key(k.function_keys[2])
-        time.sleep(1)
-        #m.press(501, 393)
-        m.press(294, 251)
-        time.sleep(0.5)
-        k.tap_key(k.enter_key)
-        print('huan 10')
-    #if (data.keyArray == ['电缆', '头', '户内干包', '25']):
-    if ('户内干包' in data.keyArray and '25' in data.keyArray):
-        k.tap_key(k.function_keys[2])
-        time.sleep(1)
-        #m.press(505, 336)
-        m.press(291, 204)
-        time.sleep(0.5)
-        k.tap_key(k.enter_key)
-        print('huan 25')
-    #m.move(mouse_position[0],mouse_position[1])
-    
     #6.10
     
     x=data.firstArgValue.split(',')[0]
@@ -208,28 +162,38 @@ def Huan(data):
     m.press(x, y)
     time.sleep(0.5)
     k.tap_key(k.enter_key)
-    
+
+    print('huan')
 
 
     
 def onpressed(key):
     if(key==keyboard.Key.caps_lock):
-        last=pyperclip.paste()
-        maxTime=3
-        mouse_position=m.position()
-        while(pyperclip.paste()==last and maxTime>0):
-            maxTime=maxTime-1
+        last = pyperclip.paste()
+        maxTime = 3
+        mouse_position = m.position()
+        while (pyperclip.paste() == last and maxTime > 0):
+            maxTime = maxTime - 1
             time.sleep(0.5)
-            #print('doing')
+            # print('doing')
             copy()
+        
         if(maxTime>0):
-            result_data= getresult(pyperclip.paste())
-            if(result_data==''or result_data.results==''or result_data.results==['']):
-                print('没有这个:\n'+pyperclip.paste()+' \n，需更新表格')
+            targetFeature=getCopy()
+            tapkey(k.escape_key)
+            tapkey(k.left_key)
+            tapkey(k.down_key)
+            tapkey(k.up_key)
+            targetName = getCopy()
+
+            result_data= getresult(targetFeature,targetName)
+            if(result_data==''or result_data.results==''or result_data.results==['']):#无结果
+                print('--无匹配--')
                 return
+           
             # print('表格：')
             # print(result_data.keyArray)
-            # print('Index:'+str(result_data.excelIndex))
+            print('Index: '+str(result_data.excelIndex))
             # print('表格end')
             k.tap_key(k.escape_key)
             
@@ -243,8 +207,8 @@ def onpressed(key):
 
                 k.type_string(result_data.results[i])
                 k.tap_key(k.enter_key)
-                if(resultdata.argType=='1' or resultdata.argType=='1.0')
-                    Huan(result_data)#----------------------------------------------------------------------------
+                if('1' in result_data.argType):
+                     Huan(result_data)#----------------------------------------------------------------------------
                 k.tap_key(k.enter_key)
 
                 if(len(result_data.args)>0 and result_data.args!=['']):
@@ -264,11 +228,12 @@ def onpressed(key):
 k=PyKeyboard()
 m=PyMouse()
 
-# time.sleep(4)
-# print(m.position())
-# p=m.position()
-# m.move(p[0],p[1])
-# time.sleep(10)
+time.sleep(5)
+print(m.position())
+
+p=m.position()
+m.move(p[0],p[1])
+time.sleep(10)
 
 datas = getExcelData()
 print('start')
@@ -276,17 +241,4 @@ with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 
 
-# def on_click(x,y,button,pressed):
-#     if(button==mouse.Button.left or button==mouse.Button.right):
-#         last = pyperclip.paste()
-#         maxTime = 5
-#         while (pyperclip.paste() == last and maxTime > 0):
-#             maxTime = maxTime - 1
-#             time.sleep(0.5)
-#             print('doing')
-#             copy()
-#         print(pyperclip.paste())
-#
-# with mouse.Listener(on_click=on_click) as listener:
-#     listener.join()
 

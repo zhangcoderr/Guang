@@ -219,17 +219,20 @@ def onpressed(key):
             for i in range(len(result_data.results)):
 
                 k.type_string(result_data.results[i])
-                k.tap_key(k.enter_key)
+                tapkey(k.enter_key)
+
                 if('1' in result_data.argType):
                      Huan(result_data)#----------------------------------------------------------------------------
-                k.tap_key(k.enter_key)
-
+                tapkey(k.enter_key)
                 #去主材 只计安装费
                 if('2' in result_data.argType):
+                    delete=False
                     for value in result_data.argValues:
                         if(value in targetFeature):
-                            tapkey(k.function_keys[4])
-                            tapkey(k.enter_key)
+                            delete=True
+
+                    tapkey(k.function_keys[4])
+                    tapkey(k.enter_key)
                 else:
                     if(len(result_data.args)>0 and result_data.args!=['']):
                         for j in range(int(result_data.args[i])):

@@ -231,8 +231,9 @@ def onpressed(key):
                         if(value in targetFeature):
                             delete=True
 
-                    tapkey(k.function_keys[4])
-                    tapkey(k.enter_key)
+                    if(delete):
+                        tapkey(k.function_keys[4])
+                        tapkey(k.enter_key)
                 else:
                     if(len(result_data.args)>0 and result_data.args!=['']):
                         for j in range(int(result_data.args[i])):

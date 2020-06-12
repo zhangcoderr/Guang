@@ -93,13 +93,15 @@ def getExcelData():
     return datas
 
 def getresult(targetFeature,targetName):
-    print(targetFeature)
+    #print(targetFeature)
     datas= getExcelData()
 
     result=ExcelData('','','','','',0,'','','')
     contains_key=False
     last_result=''
     for data in datas:
+        #if(data.excelIndex==1469):
+            #print('debug')
         if data.keyArray==['']:
             continue
         for key in data.keyArray:
@@ -154,8 +156,8 @@ def Huan(data):
     mouse_position = m.position()
     #6.10
     
-    x=data.firstArgValue.split(',')[0]
-    y=data.firstArgValue.split(',')[1]
+    x=int(data.firstArgValue.split(',')[0])
+    y=int(data.firstArgValue.split(',')[1])
     k.tap_key(k.function_keys[2])
     time.sleep(1)
     #m.press(505, 336)
@@ -169,6 +171,7 @@ def Huan(data):
     
 def onpressed(key):
     if(key==keyboard.Key.caps_lock):
+        print('doing')
         last = pyperclip.paste()
         maxTime = 3
         mouse_position = m.position()
@@ -196,10 +199,10 @@ def onpressed(key):
             print('Index: '+str(result_data.excelIndex))
             # print('表格end')
             k.tap_key(k.escape_key)
-            
-       
-                                     
-            
+
+
+
+
             tapkey(k.left_key,6)
             tapkey(k.right_key,3)
             k.tap_key(k.down_key)
@@ -211,29 +214,36 @@ def onpressed(key):
                      Huan(result_data)#----------------------------------------------------------------------------
                 k.tap_key(k.enter_key)
 
-                if(len(result_data.args)>0 and result_data.args!=['']):
-                    for j in range(int(result_data.args[i])):
-                        k.tap_key(k.enter_key)
-                        #time.sleep(1)
+                #去主材 只计安装费
+                if('2' in result_data.argType):
+                    for value in result_data.argValues:
+                        if(value in targetFeature):
+                            tapkey(k.function_keys[4])
+                            tapkey(k.enter_key)
+                else:
+                    if(len(result_data.args)>0 and result_data.args!=['']):
+                        for j in range(int(result_data.args[i])):
+                            k.tap_key(k.enter_key)
+                            #time.sleep(1)
 
 
-                    k.tap_key(k.escape_key)#！！！！/有的文件回车后在工程量计算式这列所以需要把注释去掉！！
-                    k.tap_key(k.left_key)  #自己创的文件需要去注释  别人的文件要测试下回车后在哪
-                    k.tap_key(k.left_key)
-                    k.tap_key(k.left_key)
-                    k.tap_key(k.left_key)
+                        k.tap_key(k.escape_key)#！！！！/有的文件回车后在工程量计算式这列所以需要把注释去掉！！
+                        k.tap_key(k.left_key)  #自己创的文件需要去注释  别人的文件要测试下回车后在哪
+                        k.tap_key(k.left_key)
+                        k.tap_key(k.left_key)
+                        k.tap_key(k.left_key)
+
         m.move(mouse_position[0],mouse_position[1])
         #print('move x:'+str(mouse_position[0])+'move y:'+str(mouse_position[1]))
 
 k=PyKeyboard()
 m=PyMouse()
 
-time.sleep(5)
-print(m.position())
-
-p=m.position()
-m.move(p[0],p[1])
-time.sleep(10)
+# time.sleep(5)
+# print(m.position())
+# p=m.position()
+# m.move(p[0],p[1])
+# time.sleep(10)
 
 datas = getExcelData()
 print('start')

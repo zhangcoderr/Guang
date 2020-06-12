@@ -190,7 +190,8 @@ def onpressed(key):
             tapkey(k.up_key)
             targetName = getCopy()
 
-            isSameTarget = targetName+targetFeature in sameTargets
+            addTargetStr=targetName + targetFeature
+            isSameTarget =addTargetStr  in sameTargets
 
             if(isSameTarget):
                 print('--相同项--')
@@ -205,7 +206,7 @@ def onpressed(key):
            
             # print('表格：')
             # print(result_data.keyArray)
-            sameTargets.append(targetName+targetFeature)
+            sameTargets.append(addTargetStr)
             print('Index: '+str(result_data.excelIndex))
             # print('表格end')
             k.tap_key(k.escape_key)
@@ -265,5 +266,6 @@ print('start')
 
 with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
+
 
 

@@ -180,7 +180,8 @@ def onpressed(key):
             time.sleep(0.5)
             # print('doing')
             copy()
-        
+
+
         if(maxTime>0):
             targetFeature=getCopy()
             tapkey(k.escape_key)
@@ -189,6 +190,14 @@ def onpressed(key):
             tapkey(k.up_key)
             targetName = getCopy()
 
+            isSameTarget = targetName+targetFeature in sameTargets
+
+            if(isSameTarget):
+                print('--相同项--')
+                k.type_string('SAME!!')
+                #可f4 删除，todo
+                return
+
             result_data= getresult(targetFeature,targetName)
             if(result_data==''or result_data.results==''or result_data.results==['']):#无结果
                 print('--无匹配--')
@@ -196,6 +205,7 @@ def onpressed(key):
            
             # print('表格：')
             # print(result_data.keyArray)
+            sameTargets.append(targetName+targetFeature)
             print('Index: '+str(result_data.excelIndex))
             # print('表格end')
             k.tap_key(k.escape_key)
@@ -245,8 +255,10 @@ m=PyMouse()
 # m.move(p[0],p[1])
 # time.sleep(10)
 
+sameTargets=[]
 datas = getExcelData()
 print('start')
+
 with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 

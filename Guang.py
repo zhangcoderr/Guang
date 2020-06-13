@@ -267,5 +267,3 @@ print('start')
 with keyboard.Listener(on_press=onpressed) as listener:
     listener.join()
 
-
-
